@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LandMarker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@niivue/niivue@0.44.2/dist/niivue.umd.min.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/topnav.css" />
+  </head>
+
+  <body>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- NavBar -->
+    <header>
+      <div class="topnav" id="myTopnav">
+        <a class="github-button"
+          href="https://github.com/vferat/landmarker"
+          data-icon="octicon-star"
+          data-size="large"
+          data-show-count="true"
+          data-color-scheme="no-preference: dark; light: dark;"
+          aria-label="Star ntkme/github-buttons on GitHub">Star</a>
+      </div>
+    </header>
+
+    <noscript>niivue requires JavaScript.</noscript>
+
+    <div class="container mt-6">
+        <!-- Canvas -->
+        <div class="row">
+          <canvas id="niivueCanvas" height="1024" style="width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+
+              <!-- Code block -->
+              <div class="row">
+                <div id="codeBlock">
+                  <pre>
+                    <code>Empty</code>
+                  </pre>
+                </div>
+              </div>
+
+        <div class="row">
+          <!-- Hidden file input to select files -->
+          <button id="uploadBtn" class="btn btn-primary">Load Image</button>
+          <input type="file" id="fileInput" class="hidden">
+          <!-- Set Landmarks -->
+          <button id="nasBtn" class="btn btn-primary">Update NAS</button>
+          <button id="lpaBtn" class="btn btn-primary">Update LPA</button>
+          <button id="rpaBtn" class="btn btn-primary">Update RPA</button>
+        </div>
+
+      </div>
+  
+    <script src="js/main.js" type="module" async></script>
+    <script src="js/buttons.js"></script>
+    <script src="js/code.js"></script>
+
+  </body>
+</html>
