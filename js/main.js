@@ -7,8 +7,7 @@ function updateCode() {
     var codeText = '"AnatomicalLandmarkCoordinates": {\n';
     for (var i = 0; i < nodes.length; i++) {
       var mm_pos = [nodes[i].x, nodes[i].y, nodes[i].z];
-      var frac_pos = nv1.volumes[0].convertMM2Frac(mm_pos);
-      var precise_voxel_pos = precise_frac2vox(frac_pos, nv1.volumes[0]);
+      var precise_voxel_pos = mm2nativeVox(mm_pos, nv1.volumes[0]);
       codeText += `\t\t\t\t "${nodes[i].name}":` + '[' + precise_voxel_pos + ']' + ',' + '\n'
     }
     codeText = codeText.slice(0, -2);
@@ -30,12 +29,10 @@ function updateCode() {
       node_idx = 2;
     }
     var frac_pos = nv1.scene.crosshairPos;
-    var voxel_pos = nv1.frac2vox(frac_pos);
-    var precise_voxel_pos = precise_frac2vox(frac_pos, nv1.volumes[0]);
     var mm_pos = nv1.volumes[0].convertFrac2MM(frac_pos, true);
+    var precise_voxel_pos = mm2nativeVox(mm_pos, nv1.volumes[0]);
     console.log(`crosshairpos`, frac_pos);
     console.log(`${fiducial_name} mm position`, mm_pos);
-    console.log(`${fiducial_name} voxel position`, voxel_pos);
     console.log(`${fiducial_name} precise voxel position`, precise_voxel_pos);
 
     let node = {
@@ -53,13 +50,22 @@ function updateCode() {
     updateCode();
   }
 
-  // Utility function to calculate precise fractional position
-  function precise_frac2vox(frac, image) {
-    var pos = [0, 0, 0];
-    for (var i = 0; i < 3; i++) {
-      pos[i] = frac[i] * image.dims[i+1];
-    }
-    return pos;
+  // Convert world (scanner RAS, mm) coordinates to voxel indices of the file
+  // as stored on disk. NiiVue internally reorients volumes to RAS, so its
+  // fractional/voxel coordinates only match the file for RAS-oriented images;
+  // use the header affine directly instead.
+  function mm2nativeVox(mm, image) {
+    var A = image.hdr.affine; // 4x4, rows, voxel -> mm
+    var a = A[0][0], b = A[0][1], c = A[0][2];
+    var d = A[1][0], e = A[1][1], f = A[1][2];
+    var g = A[2][0], h = A[2][1], k = A[2][2];
+    var x = mm[0] - A[0][3], y = mm[1] - A[1][3], z = mm[2] - A[2][3];
+    var det = a * (e * k - f * h) - b * (d * k - f * g) + c * (d * h - e * g);
+    return [
+      ((e * k - f * h) * x + (c * h - b * k) * y + (b * f - c * e) * z) / det,
+      ((f * g - d * k) * x + (a * k - c * g) * y + (c * d - a * f) * z) / det,
+      ((d * h - e * g) * x + (b * g - a * h) * y + (a * e - b * d) * z) / det,
+    ];
   }
 
   function addFiducialsConnectome() {
